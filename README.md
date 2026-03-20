@@ -29,7 +29,7 @@ Um projeto web interativo desenvolvido com **React + TypeScript + Vite**, criado
 Clone o repositório:
 
 ```bash
-git clone https://github.com/seu-usuario/seu-repo.git
+gh repo clone Josuerodriguers/jully.github.io
 ```
 
 Acesse a pasta:
