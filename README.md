@@ -90,33 +90,12 @@ Ao clicar no botão de coração:
 
 ---
 
-## ⚙️ Configuração do ESLint (Opcional)
 
-Para ambientes mais robustos, você pode habilitar regras mais avançadas:
 
-```js
-tseslint.configs.recommendedTypeChecked
-```
-
-ou mais estrito:
-
-```js
-tseslint.configs.strictTypeChecked
-```
-
----
-
-## 📌 Observações
-
-* Projeto focado em UI/UX e experiência visual
-* Ideal para presentes digitais, portfólios ou páginas pessoais
-* Compatível com dispositivos móveis
-
----
 
 ## 💘 Autor
 
-Desenvolvido com ❤️ por **Mário**
+Desenvolvido com ❤️ por **Josué de Azevedo Rodrigues**
 
 ---
 
