@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState, type CSSProperties } from 'react'
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import './App.css'
+import loveSong from './music/Chris Stapleton - Tennessee Whiskey.mp3'
 
 const START_DATE = new Date('2018-03-20T00:00:00')
 const PASSCODE = '20032018'
@@ -49,7 +50,6 @@ type ImageSize = {
   ratio: number
 }
 
-
 type HeartDrop = {
   id: number
   left: number
@@ -58,8 +58,6 @@ type HeartDrop = {
   delay: number
   drift: number
 }
-
-
 
 function App() {
   const [locked, setLocked] = useState(true)
@@ -74,6 +72,9 @@ function App() {
     height: 5,
     ratio: 4 / 5,
   })
+  const [isPlaying, setIsPlaying] = useState(false)
+
+  const audioRef = useRef<HTMLAudioElement | null>(null)
 
   const currentImage = useMemo(() => images[currentIndex], [currentIndex])
 
@@ -140,15 +141,65 @@ function App() {
     }
   }, [isImageOpen])
 
-  const onUnlock = () => {
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio) return
+
+    const handlePlay = () => setIsPlaying(true)
+    const handlePause = () => setIsPlaying(false)
+    const handleEnded = () => setIsPlaying(false)
+
+    audio.addEventListener('play', handlePlay)
+    audio.addEventListener('pause', handlePause)
+    audio.addEventListener('ended', handleEnded)
+
+    return () => {
+      audio.removeEventListener('play', handlePlay)
+      audio.removeEventListener('pause', handlePause)
+      audio.removeEventListener('ended', handleEnded)
+    }
+  }, [])
+
+  const playMusic = async () => {
+    const audio = audioRef.current
+    if (!audio) return
+
+    try {
+      audio.volume = 0.45
+      await audio.play()
+      setIsPlaying(true)
+    } catch (err) {
+      console.error('Não foi possível iniciar a música:', err)
+    }
+  }
+
+  const toggleMusic = async () => {
+    const audio = audioRef.current
+    if (!audio) return
+
+    try {
+      if (audio.paused) {
+        await audio.play()
+        setIsPlaying(true)
+      } else {
+        audio.pause()
+        setIsPlaying(false)
+      }
+    } catch (err) {
+      console.error('Erro ao controlar a música:', err)
+    }
+  }
+
+  const onUnlock = async () => {
     if (password.trim() === PASSCODE) {
       setLocked(false)
       setError('')
       setCounter(getCounterData())
+      await playMusic()
       return
     }
 
-    setError('Senha incorreta.\n 💡Dica: Nosso início 💌')
+    setError('Senha incorreta. Tente novamente. Dica: nosso início 💌')
   }
 
   const prevImage = () => {
@@ -159,11 +210,10 @@ function App() {
     setCurrentIndex((prev) => (prev + 1) % images.length)
   }
 
-
   const triggerHeartRain = () => {
     const drops: HeartDrop[] = Array.from({ length: 28 }, (_, index) => ({
       id: Date.now() + index,
-      left: Math.random() * 100,
+      left: 5 + Math.random() * 90,
       size: 18 + Math.random() * 22,
       duration: 3 + Math.random() * 2.5,
       delay: Math.random() * 0.8,
@@ -181,6 +231,8 @@ function App() {
 
   return (
     <>
+      <audio ref={audioRef} src={loveSong} preload="auto" loop />
+
       {heartRain.length > 0 && (
         <div className="heart-rain" aria-hidden="true">
           {heartRain.map((heart, index) => {
@@ -207,13 +259,14 @@ function App() {
           })}
         </div>
       )}
+
       <div className="page">
         <div className="card">
           {locked ? (
             <div className="lock-card">
               <div className="lock-heart">💖</div>
-              <h1>Bem-vindo! Momo</h1>
-              <p className="lock-subtitle">Digite a senha</p>
+              <h1>Bem-vindo, amor</h1>
+              <p className="lock-subtitle">Digite nossa data especial</p>
 
               <input
                 type="password"
@@ -221,18 +274,12 @@ function App() {
                 maxLength={8}
                 aria-label="Senha em data"
                 value={password}
-                onChange={(e) => {
-                  const onlyNumbers = e.target.value.replace(/\D/g, '')
-                  setPassword(onlyNumbers)
-                }}
-                onKeyDown={(e) => e.key === 'Enter' && onUnlock()}
+                onChange={(e) => setPassword(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && void onUnlock()}
               />
 
-              <button onClick={onUnlock}>Entrar</button>
-
-              <p className="error" style={{ whiteSpace: 'pre-line' }}>
-                {error}
-              </p>
+              <button onClick={() => void onUnlock()}>Entrar</button>
+              <p className="error">{error}</p>
             </div>
           ) : (
             <div className="main-card">
@@ -252,11 +299,27 @@ function App() {
                 </button>
               </div>
 
+              <div className="music-player">
+                <div className="music-info">
+                  <span className="music-label">Tocando agora</span>
+                  <strong className="music-title">Tennessee Whiskey — Chris Stapleton</strong>
+                </div>
+
+                <button
+                  className="music-btn"
+                  type="button"
+                  onClick={() => void toggleMusic()}
+                  aria-label={isPlaying ? 'Pausar música' : 'Tocar música'}
+                >
+                  {isPlaying ? '⏸️ Pausar' : '▶️ Tocar'}
+                </button>
+              </div>
+
               <div className="content">
                 <div className="counter-box">
-                  <div className="counter-title">
-  Eu te amo há <span className="heart-inline">❤️</span>
-</div>
+                  <p className="counter-title">
+                    Eu te amo há <span className="heart-inline">❤️</span>
+                  </p>
                   <p className="counter-days">{counter.days.toLocaleString()} dias</p>
                   <p className="counter-time">
                     {pad(counter.hours)}h : {pad(counter.minutes)}m : {pad(counter.seconds)}s
@@ -303,10 +366,11 @@ function App() {
                   </div>
                 </div>
               </div>
-              <p className='bottom-message'>eu tento entender o que sinto </p>
-              <p className='bottom-message'>mas toda vez que penso em você</p>
-              <p className='bottom-message'>eu deixo de querer entender</p>
-              <p className='bottom-message'>e só sinto</p>
+
+              <p className="bottom-message">eu tento entender o que sinto</p>
+              <p className="bottom-message">mas toda vez que penso em você</p>
+              <p className="bottom-message">eu deixo de querer entender</p>
+              <p className="bottom-message">e só sinto</p>
               <p className="bottom-message">A cada dia te amo mais. 💞</p>
             </div>
           )}
