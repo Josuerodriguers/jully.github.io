@@ -199,7 +199,7 @@ function App() {
       return
     }
 
-    setError('Senha incorreta. Tente novamente. Dica: nosso início 💌')
+    setError('Senha incorreta. Dica: nosso início 💌')
   }
 
   const prevImage = () => {
@@ -265,7 +265,7 @@ function App() {
           {locked ? (
             <div className="lock-card">
               <div className="lock-heart">💖</div>
-              <h1>Bem-vindo, amor</h1>
+              <h1>Bem-vindo! Momo</h1>
               <p className="lock-subtitle">Digite nossa data especial</p>
 
               <input
@@ -274,7 +274,10 @@ function App() {
                 maxLength={8}
                 aria-label="Senha em data"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  const onlyNumbers = e.target.value.replace(/\D/g, '');
+                  setPassword(onlyNumbers);
+                }}
                 onKeyDown={(e) => e.key === 'Enter' && void onUnlock()}
               />
 
