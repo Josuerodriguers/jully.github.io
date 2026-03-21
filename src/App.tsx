@@ -86,6 +86,14 @@ function App() {
   }, [locked])
 
   useEffect(() => {
+    if (!locked) {
+      setTimeout(() => {
+        triggerHeartRain()
+      }, 500)
+    }
+  }, [locked])
+
+  useEffect(() => {
     if (!locked && !isImageOpen) {
       const slide = window.setInterval(() => {
         setCurrentIndex((prev) => (prev + 1) % images.length)
@@ -210,7 +218,10 @@ function App() {
     setCurrentIndex((prev) => (prev + 1) % images.length)
   }
 
-  const triggerHeartRain = () => {
+const triggerHeartRain = () => {
+  setHeartRain([])
+
+  setTimeout(() => {
     const drops: HeartDrop[] = Array.from({ length: 28 }, (_, index) => ({
       id: Date.now() + index,
       left: 5 + Math.random() * 90,
@@ -221,11 +232,12 @@ function App() {
     }))
 
     setHeartRain(drops)
+  }, 50)
 
-    window.setTimeout(() => {
-      setHeartRain([])
-    }, 7000)
-  }
+  setTimeout(() => {
+    setHeartRain([])
+  }, 7000)
+}
 
   const aspectRatio = `${imageSize.width} / ${imageSize.height}`
 
