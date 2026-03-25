@@ -17,6 +17,8 @@ const images = [
   new URL('./imgs/WhatsApp Image 2026-03-20 at 10.07.03.jpeg', import.meta.url).href,
   new URL('./imgs/WhatsApp Image 2026-03-20 at 12.17.26.jpeg', import.meta.url).href,
   new URL('./imgs/WhatsApp Image 2026-03-20 at 10.08.27.jpeg', import.meta.url).href,
+  new URL('./imgs/WhatsApp Image 2026-03-25 at 17.07.26 (1).jpeg', import.meta.url).href,
+  new URL('./imgs/WhatsApp Image 2026-03-25 at 17.07.26.jpeg', import.meta.url).href,
 ]
 
 const pad = (value: number) => String(value).padStart(2, '0')
